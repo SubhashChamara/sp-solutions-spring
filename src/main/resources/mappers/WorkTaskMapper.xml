@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="biz.spsolutions.workallocationpanel.app.dao.mapper.WorkTaskMapper">
+
+        <resultMap id="workTaskMap" type="biz.spsolutions.workallocationpanel.app.entity.WorkTask">
+            <result property="wfRef" column="Wf_Ref" />
+            <result property="clientName" column="Client_Name" />
+            <result property="projectName" column="Project_Name" />
+            <result property="jobType" column="Job_Type" />
+            <result property="taskName" column="Task_Name" />
+            <result property="chargeStatus" column="Charge_Status" />
+            <result property="allocatedTime" column="Allocated_Time" />
+            <result property="developer" column="Assigned_Developer" />
+            <result property="elapsedTime" column="Elapsed_Time" />
+            <result property="workCompletedDate" column="Completed_Date" />
+            <result property="submissionDate" column="Due_Date" />
+            <result property="workType" column="Work_Type" />
+            <result property="bugFixType" column="Bug_Fix_Type" />
+            <result property="workDescription" column="Work_Description" />
+            <result property="workPriority" column="Work_Priority" />
+            <result property="taskOverallStatus" column="Task_Status" />
+        </resultMap>
+
+        <select id="getAll" resultMap="workTaskMap">
+            SELECT
+                wt.businesskey AS Wf_Ref,
+                mc.NAME_ AS Client_Name,
+                mp.projectName AS Project_Name,
+                mj.JOB_TYPE AS Job_Type,
+                wt.taskName AS Task_Name,
+                CASE
+                    WHEN wt.chargeStatus = 'Maintainance' THEN 'MNTN'
+                    WHEN wt.chargeStatus = 'Charged' THEN 'CHD'
+                    WHEN wt.chargeStatus = 'FOC' THEN 'FOC'
+                    ELSE 'NA'
+                    END AS Charge_Status,
+                wt.allocatedTimeString AS Allocated_Time,
+                CASE
+                    WHEN wa.assignedDeveloper_ID IS NOT NULL THEN CONCAT(au.FIRST_,' ',au.LAST_)
+                    ELSE ''
+                        END AS Assigned_Developer,
+                wt.elapsedTimeString AS Elapsed_Time,
+                wt.workCompletedDate AS Completed_Date,
+                wt.submitionDate AS Due_Date,
+                CASE
+                    WHEN wt.workType = 'Bug Fix'THEN 'BF'
+                    WHEN wt.workType = 'New Requirement'THEN 'NR'
+                    WHEN wt.workType = 'Change Logic' THEN 'CL'
+                    WHEN wt.workType = 'Change Requirement' THEN 'CR'
+                    WHEN wt.workType = 'Complaint' THEN 'CT'
+                    WHEN wt.workType = 'System Implimentation' THEN 'SI'
+                    WHEN wt.workType = 'System Design' THEN 'SD'
+
+                        END AS Work_Type,
+                wt.BUG_FIX_TYPE AS Bug_Fix_Type,
+                wt.workDescription AS Work_Description,
+                wt.workPriority AS Work_Priority,
+                CASE
+                    WHEN wt.taskOverallStatus = 'ONGOING' THEN 'ONGOING'
+                    WHEN wt.taskOverallStatus = 'HOLD' THEN 'HOLD'
+                    WHEN wt.taskOverallStatus = 'COMPLETED' THEN 'COMPLETED'
+                    WHEN wt.taskOverallStatus = 'DEV.COMPLETED' THEN 'DEV.COMPD'
+                    WHEN wt.taskOverallStatus = 'DEV.RETURN' THEN 'DEV.RETURN'
+                    WHEN wt.taskOverallStatus = 'QA.COMPLETED' THEN 'QA.COMPD'
+                    WHEN wt.taskOverallStatus = 'QA.PENDING' THEN 'QA.PEND'
+                    WHEN wt.taskOverallStatus = 'NEW' THEN 'NEW'
+                    WHEN wt.taskOverallStatus = 'WITH DH' THEN 'WITH DH'
+                    WHEN wt.taskOverallStatus = 'RELEASED' THEN 'RELEASED'
+                    WHEN wt.taskOverallStatus = 'ALLOCATED' THEN 'ALLOCATED'
+                    END AS Task_Status,
+
+            ah.ASSIGNEE_ AS Pending_User
+
+            FROM  worktask wt
+                     LEFT JOIN workallocationflow wa ON wt.workAllocation_ID = wa.id
+                     LEFT JOIN master_client mc ON wt.client_ID = mc.ID_
+                     LEFT JOIN master_project mp ON wt.project_ID = mp.id
+                     LEFT JOIN master_job_type mj ON wt.fk_job_type = mj.ID
+                     LEFT JOIN act_id_user au ON wa.assignedDeveloper_ID = au.ID_
+                     LEFT JOIN act_hi_taskinst ah ON wt.processinstance = ah.PROC_INST_ID_
+            <where>
+                    wt.active=true
+                <if test="wfRef == null">
+
+                    <if test="startDate != null and endDate != null">
+                      AND  wt.submitionDate BETWEEN #{startDate} AND #{endDate}
+                    </if>
+
+                    <if test="clientId != null">
+                       AND wt.client_ID = #{clientId}
+                    </if>
+
+                    <if test="projectId != null">
+                       AND wt.project_ID = #{projectId}
+                    </if>
+
+                    <if test="overallStatus != null">
+                        <if test="overallStatus == 'INCOMPLETED'">
+                          AND  wt.taskOverallStatus != 'COMPLETED'
+                        </if>
+                        <if test="overallStatus != 'INCOMPLETED'">
+                          AND  wt.taskOverallStatus = #{overallStatus}
+                        </if>
+                    </if>
+
+                    <if test="developerId != null">
+                       AND wa.assignedDeveloper_ID = #{developerId}
+                    </if>
+
+                    <if test="workType != null">
+                       AND wt.workType = #{workType}
+                    </if>
+
+                    <if test="chargeType != null">
+                       AND wt.chargeStatus = #{chargeType}
+                    </if>
+
+                    <if test="jobType != null">
+                       AND wt.fk_job_type = #{jobType}
+                    </if>
+                </if>
+                <if  test="wfRef != null">
+                    AND wt.businesskey = #{wfRef}
+                </if>
+                <if  test="pendingUser != null">
+                    AND ah.END_TIME_ IS NULL AND ah.ASSIGNEE_ = #{pendingUser}
+                </if>
+            </where>
+
+        </select>
+
+    </mapper>

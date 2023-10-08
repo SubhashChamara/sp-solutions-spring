@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="biz.spsolutions.workallocationpanel.app.dao.mapper.TesterMapper">
+
+        <resultMap id="testerResultMap" type="biz.spsolutions.workallocationpanel.app.entity.Tester">
+            <id property="nameNew" column="name" />
+            <result property="address" column="address" />
+            <association property="supervisor" column="supervisor_name" javaType="biz.spsolutions.workallocationpanel.app.entity.Supervisor">
+                <id property="nameNew" column="supervisor_name" />
+                <result property="address" column="supervisor_address" />
+                <result property="age" column="supervisor_age" />
+            </association>
+
+        </resultMap>
+
+        <select id="getAll" resultMap="testerResultMap">
+            SELECT t.name, t.address, t.supervisor_name,
+                   s.address as supervisor_address, s.age as supervisor_age
+
+            FROM Tester t
+                     LEFT JOIN Supervisor s ON t.supervisor_name = s.name
+
+        </select>
+
+
+    </mapper>
