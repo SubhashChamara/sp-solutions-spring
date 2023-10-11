@@ -80,7 +80,7 @@
                      LEFT JOIN master_project mp ON wt.project_ID = mp.id
                      LEFT JOIN master_job_type mj ON wt.fk_job_type = mj.ID
                      LEFT JOIN act_id_user au ON wa.assignedDeveloper_ID = au.ID_
-                     LEFT JOIN act_hi_taskinst ah ON wt.processinstance = ah.PROC_INST_ID_
+                     LEFT JOIN act_hi_taskinst ah ON wt.processinstance = ah.PROC_INST_ID_ AND ah.END_TIME_ is null
             <where>
                     wt.active=true
                 <if test="wfRef == null">
@@ -121,13 +121,15 @@
                     <if test="jobType != null">
                        AND wt.fk_job_type = #{jobType}
                     </if>
+
+                    <if  test="pendingUser != null">
+                        AND ah.END_TIME_ IS NULL AND ah.ASSIGNEE_ = #{pendingUser}
+                    </if>
                 </if>
                 <if  test="wfRef != null">
                     AND wt.businesskey = #{wfRef}
                 </if>
-                <if  test="pendingUser != null">
-                    AND ah.END_TIME_ IS NULL AND ah.ASSIGNEE_ = #{pendingUser}
-                </if>
+
             </where>
 
         </select>
