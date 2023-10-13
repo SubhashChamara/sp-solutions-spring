@@ -23,8 +23,10 @@
             <result property="workPriority" column="Work_Priority" />
             <result property="taskOverallStatus" column="Task_Status" />
         </resultMap>
+        <resultMap id="Long" type="java.lang.Long" />
 
-        <select id="getAll" resultMap="workTaskMap">
+
+    <select id="getAll" resultMap="workTaskMap">
             SELECT
                 wt.businesskey AS Wf_Ref,
                 mc.NAME_ AS Client_Name,
@@ -82,7 +84,7 @@
                      LEFT JOIN act_id_user au ON wa.assignedDeveloper_ID = au.ID_
                      LEFT JOIN act_hi_taskinst ah ON wt.processinstance = ah.PROC_INST_ID_ AND ah.END_TIME_ is null
             <where>
-                    wt.active=true
+                 wt.active=true
                 <if test="wfRef == null">
 
                     <if test="startDate != null and endDate != null">
@@ -93,7 +95,7 @@
                        AND wt.client_ID = #{clientId}
                     </if>
 
-                    <if test="projectId != null">
+                    <if test="projectId != null and clientUserId == null">
                        AND wt.project_ID = #{projectId}
                     </if>
 
@@ -106,7 +108,7 @@
                         </if>
                     </if>
 
-                    <if test="developerId != null">
+                    <if test="developerId != null and clientUserId == null">
                        AND wa.assignedDeveloper_ID = #{developerId}
                     </if>
 
@@ -118,20 +120,115 @@
                        AND wt.chargeStatus = #{chargeType}
                     </if>
 
-                    <if test="jobType != null">
+                    <if test="jobType != null and clientUserId == null">
                        AND wt.fk_job_type = #{jobType}
                     </if>
 
                     <if  test="pendingUser != null">
                         AND ah.END_TIME_ IS NULL AND ah.ASSIGNEE_ = #{pendingUser}
                     </if>
+                    <if  test="clientUserId != null">
+                        AND wt.created_user_ID=#{clientUserId}
+                    </if>
                 </if>
                 <if  test="wfRef != null">
                     AND wt.businesskey = #{wfRef}
+
+                    <if  test="clientUserId != null">
+                        AND wt.created_user_ID=#{clientUserId}
+                    </if>
+
                 </if>
 
             </where>
 
+            <if test="pageable.offset >= 0 and pageable.pageSize > 0">
+                LIMIT #{pageable.pageSize}
+                OFFSET #{pageable.offset}
+            </if>
+
         </select>
+
+    <select id="getTotalCount" resultMap="Long">
+        SELECT COUNT(*)
+
+        FROM  worktask wt
+        LEFT JOIN workallocationflow wa ON wt.workAllocation_ID = wa.id
+        LEFT JOIN master_client mc ON wt.client_ID = mc.ID_
+        LEFT JOIN master_project mp ON wt.project_ID = mp.id
+        LEFT JOIN master_job_type mj ON wt.fk_job_type = mj.ID
+        LEFT JOIN act_id_user au ON wa.assignedDeveloper_ID = au.ID_
+        LEFT JOIN act_hi_taskinst ah ON wt.processinstance = ah.PROC_INST_ID_ AND ah.END_TIME_ is null
+        <where>
+            wt.active=true
+            <if test="wfRef == null">
+
+                <if test="startDate != null and endDate != null">
+                    AND  wt.submitionDate BETWEEN #{startDate} AND #{endDate}
+                </if>
+
+                <if test="clientId != null">
+                    AND wt.client_ID = #{clientId}
+                </if>
+
+                <if test="projectId != null">
+                    AND wt.project_ID = #{projectId}
+                </if>
+
+                <if test="overallStatus != null">
+                    <if test="overallStatus == 'INCOMPLETED'">
+                        AND  wt.taskOverallStatus != 'COMPLETED'
+                    </if>
+                    <if test="overallStatus != 'INCOMPLETED'">
+                        AND  wt.taskOverallStatus = #{overallStatus}
+                    </if>
+                </if>
+
+                <if test="developerId != null">
+                    AND wa.assignedDeveloper_ID = #{developerId}
+                </if>
+
+                <if test="workType != null">
+                    AND wt.workType = #{workType}
+                </if>
+
+                <if test="chargeType != null">
+                    AND wt.chargeStatus = #{chargeType}
+                </if>
+
+                <if test="jobType != null">
+                    AND wt.fk_job_type = #{jobType}
+                </if>
+
+                <if  test="pendingUser != null">
+                    AND ah.END_TIME_ IS NULL AND ah.ASSIGNEE_ = #{pendingUser}
+                </if>
+            </if>
+            <if  test="wfRef != null">
+                AND wt.businesskey = #{wfRef}
+            </if>
+
+        </where>
+
+    </select>
+
+    <update id="updateWorkTask" parameterType="biz.spsolutions.workallocationpanel.app.entity.WorkTask">
+            UPDATE worktask
+            SET
+                fk_job_type = #{jobType},
+                taskName = #{taskName},
+                chargeStatus = #{chargeType},
+                allocatedTimeString = #{allocatedTimeString},
+                submitionDate = #{submissionDate},
+                workType = #{workType},
+                Bug_Fix_Type = #{bugFixType},
+                workDescription = #{workDescription},
+                taskType=#{taskType},
+                workPriority=#{workPriority}
+            WHERE businesskey = #{wfRef};
+
+
+
+        </update>
 
     </mapper>

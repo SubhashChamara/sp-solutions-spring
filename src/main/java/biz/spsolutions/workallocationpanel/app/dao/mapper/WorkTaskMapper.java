@@ -3,6 +3,8 @@ package biz.spsolutions.workallocationpanel.app.dao.mapper;
 import biz.spsolutions.workallocationpanel.app.entity.WorkTask;
 import biz.spsolutions.workallocationpanel.app.entity.WorkTaskOriginal;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -28,5 +30,8 @@ public interface WorkTaskMapper {
 //        @Result(property = "releaseDeployment",column = "FK_RELEASE_DEPLOYMENT"),
 //    })
 
-    List<WorkTask> getAll(String wfRef, Date startDate, Date endDate, Integer clientId, Integer projectId, String overallStatus, String developerId, String workType, String chargeType, BigInteger jobType,String userId,String pendingUser);
+    List<WorkTask> getAll(Pageable pageable, String wfRef, Date startDate, Date endDate, Integer clientId, Integer projectId, String overallStatus, String developerId, String workType, String chargeType, BigInteger jobType, String userId, String pendingUser,String clientUserId);
+    Long getTotalCount(String wfRef, Date startDate, Date endDate, Integer clientId, Integer projectId, String overallStatus, String developerId, String workType, String chargeType, BigInteger jobType, String userId, String pendingUser);
+
+    void updateWorkTask(String wfRef,String jobType, String taskName, String chargeType, String allocatedTimeString, Date submissionDate, String workType, String bugFixType, String workDescription, String taskType, String workPriority);
 }

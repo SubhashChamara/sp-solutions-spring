@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="biz.spsolutions.workallocationpanel.app.dao.mapper.ActIdMembershipMapper">
+
+
+    <resultMap id="IntResultMap" type="java.lang.Integer" />
+
+    <select id="getUserGroupId" resultMap="IntResultMap">
+
+            SELECT
+                COUNT(*)
+                FROM act_id_membership am
+                <where>
+                 am.USER_ID_= #{userId} AND am.GROUP_ID_='CLIENT'
+                </where>
+        </select>
+
+    </mapper>

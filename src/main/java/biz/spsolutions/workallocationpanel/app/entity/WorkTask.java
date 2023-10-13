@@ -29,4 +29,7 @@ public class WorkTask implements Serializable {
     private String workPriority;
     private String taskOverallStatus;
 
+    private String taskType;
+
+
 }
