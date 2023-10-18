@@ -22,6 +22,8 @@
             <result property="workDescription" column="Work_Description" />
             <result property="workPriority" column="Work_Priority" />
             <result property="taskOverallStatus" column="Task_Status" />
+            <result property="accountManager" column="Account_Manager" />
+            <result property="developerManager" column="Developer_Manager" />
         </resultMap>
 
     <resultMap id="workTaskCounterMap" type="biz.spsolutions.workallocationpanel.app.entity.WorkTaskCounter">
@@ -98,7 +100,9 @@
                     WHEN wt.taskOverallStatus = 'ALLOCATED' THEN 'ALLOCATED'
                     END AS Task_Status,
 
-            ah.ASSIGNEE_ AS Pending_User
+            ah.ASSIGNEE_ AS Pending_User,
+            wa.createdUser_ID AS Account_Manager,
+            wa.departmentHeadUser_ID AS Developer_Manager
 
             FROM  worktask wt
                      LEFT JOIN workallocationflow wa ON wt.workAllocation_ID = wa.id
@@ -166,7 +170,7 @@
 
             </where>
 
-            <if test="pageable.offset >= 0 and pageable.pageSize > 0">
+            <if test="pageable != null and pageable.offset >= 0 and pageable.pageSize > 0">
                 LIMIT #{pageable.pageSize}
                 OFFSET #{pageable.offset}
             </if>

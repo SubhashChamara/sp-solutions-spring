@@ -28,5 +28,7 @@ public class WorkTaskDTO implements Serializable {
     private String workDescription;
     private String workPriority;
     private String taskOverallStatus;
+    private String accountManager;
+    private String developerManager;
     
 }
