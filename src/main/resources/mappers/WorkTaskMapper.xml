@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-    <mapper namespace="biz.spsolutions.workallocationpanel.app.dao.mapper.WorkTaskMapper">
+    <mapper namespace="biz.spsolutions.workallocationpanel.app.mapper.WorkTaskMapper">
 
         <resultMap id="workTaskMap" type="biz.spsolutions.workallocationpanel.app.entity.WorkTask">
             <result property="wfRef" column="Wf_Ref" />
@@ -23,11 +23,35 @@
             <result property="workPriority" column="Work_Priority" />
             <result property="taskOverallStatus" column="Task_Status" />
         </resultMap>
+
+    <resultMap id="workTaskCounterMap" type="biz.spsolutions.workallocationpanel.app.entity.WorkTaskCounter">
+        <result property="totalCount" column="TOTAL_COUNT" />
+        <result property="allocatedCount" column="Allocated_Count" />
+        <result property="ongoingCount" column="Ongoing_Count" />
+        <result property="holdCount" column="Hold_Count" />
+        <result property="newCount" column="New_Count" />
+        <result property="lateCount" column="Late_Count" />
+        <result property="devCompletedCount" column="DevCompleted_Count" />
+        <result property="devReturnCount" column="Dev_Return_Count" />
+        <result property="qAPendingCount" column="Qa_Pending_Count" />
+        <result property="qACompletedCount" column="Qa_Completed_Count" />
+        <result property="completedCount" column="Completed_Count" />
+        <result property="inCompletedCount" column="Incomplete_Count" />
+        <result property="newRequirementCount" column="New_Requirement_Count" />
+        <result property="newBusinessCount" column="New_Business_Count" />
+        <result property="changeLogicCount" column="Change_Logic_Count" />
+        <result property="changeRequirementCount" column="Change_Requirement_Count" />
+        <result property="bugFixCount" column="Bug_Fix_Count" />
+        <result property="complaintCount" column="Complaint_Count" />
+    </resultMap>
+
         <resultMap id="Long" type="java.lang.Long" />
 
 
+
+
     <select id="getAll" resultMap="workTaskMap">
-            SELECT
+            SELECT SQL_CALC_FOUND_ROWS
                 wt.businesskey AS Wf_Ref,
                 mc.NAME_ AS Client_Name,
                 mp.projectName AS Project_Name,
@@ -149,6 +173,117 @@
 
         </select>
 
+    <select id="getCounts" resultMap="workTaskCounterMap">
+        SELECT
+        COUNT(*) AS TOTAL_COUNT,
+        COUNT(CASE WHEN wt.taskOverallStatus = 'ALLOCATED' THEN 1 END) AS Allocated_Count,
+        COUNT(CASE WHEN wt.taskOverallStatus = 'ONGOING' THEN 1 END) AS Ongoing_Count,
+        COUNT(CASE WHEN wt.taskOverallStatus = 'HOLD' THEN 1 END) AS Hold_Count,
+        COUNT(CASE WHEN wt.taskOverallStatus = 'NEW' THEN 1 END) AS New_Count,
+        COUNT(CASE WHEN wt.taskOverallStatus = 'DEV.COMPLETED' THEN 1 END) AS DevCompleted_Count,
+        COUNT(CASE WHEN wt.taskOverallStatus = 'DEV.RETURN' THEN 1 END) AS Dev_Return_Count,
+        COUNT(CASE WHEN wt.taskOverallStatus = 'QA.PENDING' THEN 1 END) AS Qa_Pending_Count,
+        COUNT(CASE WHEN wt.taskOverallStatus = 'QA.COMPLETED' THEN 1 END) AS Qa_Completed_Count,
+        COUNT(CASE WHEN wt.taskOverallStatus = 'COMPLETED' THEN 1 END) AS Completed_Count,
+        COUNT(CASE WHEN
+        wt.taskOverallStatus NOT IN ('ONGOING', 'HOLD', 'COMPLETED', 'DEV.COMPLETED', 'DEV.RETURN',
+        'QA.COMPLETED', 'QA.PENDING', 'NEW', 'WITH DH', 'RELEASED', 'ALLOCATED')
+        THEN 1 END) AS Incomplete_Count,
+
+
+        COUNT(CASE WHEN wt.workType = 'New Requirement' THEN 1 END) AS New_Requirement_Count,
+        COUNT(CASE WHEN wt.workType = 'New Business' THEN 1 END) AS New_Business_Count,
+        COUNT(CASE WHEN wt.workType = 'Change Logic' THEN 1 END) AS Change_Logic_Count,
+        COUNT(CASE WHEN wt.workType = 'Change Requirement' THEN 1 END) AS Change_Requirement_Count,
+        COUNT(CASE WHEN wt.workType = 'Bug Fix' THEN 1 END) AS Bug_Fix_Count,
+        COUNT(CASE WHEN wt.workType = 'Complaint' THEN 1 END) AS Complaint_Count,
+
+
+        COUNT(
+        CASE WHEN (wt.workCompletedDate IS NOT NULL AND (wt.submitionDate &lt;= wt.workCompletedDate))
+        OR
+        (wt.workCompletedDate IS NULL AND (wt.submitionDate &lt; #{today}) )
+        THEN 1 END
+        ) AS Late_Count
+
+
+        FROM  worktask wt
+        LEFT JOIN workallocationflow wa ON wt.workAllocation_ID = wa.id
+        LEFT JOIN master_client mc ON wt.client_ID = mc.ID_
+        LEFT JOIN master_project mp ON wt.project_ID = mp.id
+        LEFT JOIN master_job_type mj ON wt.fk_job_type = mj.ID
+        LEFT JOIN act_id_user au ON wa.assignedDeveloper_ID = au.ID_
+        LEFT JOIN act_hi_taskinst ah ON wt.processinstance = ah.PROC_INST_ID_ AND ah.END_TIME_ is null
+        <where>
+            wt.active=true
+            <if test="wfRef == null">
+
+                <if test="startDate != null and endDate != null">
+                    AND  wt.submitionDate BETWEEN #{startDate} AND #{endDate}
+                </if>
+
+                <if test="clientId != null">
+                    AND wt.client_ID = #{clientId}
+                </if>
+
+                <if test="projectId != null and clientUserId == null">
+                    AND wt.project_ID = #{projectId}
+                </if>
+
+                <if test="overallStatus != null">
+                    <if test="overallStatus == 'INCOMPLETED'">
+                        AND  wt.taskOverallStatus != 'COMPLETED'
+                    </if>
+                    <if test="overallStatus != 'INCOMPLETED'">
+                        AND  wt.taskOverallStatus = #{overallStatus}
+                    </if>
+                </if>
+
+                <if test="developerId != null and clientUserId == null">
+                    AND wa.assignedDeveloper_ID = #{developerId}
+                </if>
+
+                <if test="workType != null">
+                    AND wt.workType = #{workType}
+                </if>
+
+                <if test="chargeType != null">
+                    AND wt.chargeStatus = #{chargeType}
+                </if>
+
+                <if test="jobType != null and clientUserId == null">
+                    AND wt.fk_job_type = #{jobType}
+                </if>
+
+                <if  test="pendingUser != null">
+                    AND ah.END_TIME_ IS NULL AND ah.ASSIGNEE_ = #{pendingUser}
+                </if>
+
+                <if  test="clientUserId != null">
+                    AND wt.created_user_ID=#{clientUserId}
+                </if>
+            </if>
+            <if  test="wfRef != null">
+                AND wt.businesskey = #{wfRef}
+
+                <if  test="clientUserId != null">
+                    AND wt.created_user_ID=#{clientUserId}
+                </if>
+
+            </if>
+
+        </where>
+
+    </select>
+
+
+
+
+
+    <select id="getTotalCounts" resultType="java.lang.Long">
+        SELECT FOUND_ROWS()
+    </select>
+
     <select id="getTotalCount" resultMap="Long">
         SELECT COUNT(*)
 
@@ -171,7 +306,7 @@
                     AND wt.client_ID = #{clientId}
                 </if>
 
-                <if test="projectId != null">
+                <if test="projectId != null and clientUserId == null">
                     AND wt.project_ID = #{projectId}
                 </if>
 
@@ -184,7 +319,7 @@
                     </if>
                 </if>
 
-                <if test="developerId != null">
+                <if test="developerId != null and clientUserId == null">
                     AND wa.assignedDeveloper_ID = #{developerId}
                 </if>
 
@@ -196,16 +331,25 @@
                     AND wt.chargeStatus = #{chargeType}
                 </if>
 
-                <if test="jobType != null">
+                <if test="jobType != null and clientUserId == null">
                     AND wt.fk_job_type = #{jobType}
                 </if>
 
                 <if  test="pendingUser != null">
                     AND ah.END_TIME_ IS NULL AND ah.ASSIGNEE_ = #{pendingUser}
                 </if>
+
+                <if  test="clientUserId != null">
+                    AND wt.created_user_ID=#{clientUserId}
+                </if>
             </if>
             <if  test="wfRef != null">
                 AND wt.businesskey = #{wfRef}
+
+                <if  test="clientUserId != null">
+                    AND wt.created_user_ID=#{clientUserId}
+                </if>
+
             </if>
 
         </where>

@@ -1,10 +1,8 @@
 package biz.spsolutions.workallocationpanel.app.business.util;
 
-import biz.spsolutions.workallocationpanel.app.dto.TesterDTO;
+import biz.spsolutions.workallocationpanel.app.dto.WorkTaskRequestDTO;
 import biz.spsolutions.workallocationpanel.app.dto.WorkTaskDTO;
-import biz.spsolutions.workallocationpanel.app.entity.Tester;
 import biz.spsolutions.workallocationpanel.app.entity.WorkTask;
-import biz.spsolutions.workallocationpanel.app.entity.WorkTaskOriginal;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -16,16 +14,8 @@ public class Transformer {
         return modelMapper.map(workTask, WorkTaskDTO.class);
     }
 
-    public WorkTask toEntity(WorkTaskDTO workTaskDTO) {
-        return modelMapper.map(workTaskDTO, WorkTask.class);
+    public WorkTask toEntity(WorkTaskRequestDTO workTaskRequestDTO) {
+        return modelMapper.map(workTaskRequestDTO, WorkTask.class);
     }
 
-    public TesterDTO fromEntityTester(Tester tester) {
-        System.out.println("TesterTransform"+modelMapper.map(Tester.class, TesterDTO.class));
-        return modelMapper.map(tester, TesterDTO.class);
-    }
-
-    public Tester toEntityTester(TesterDTO testerDTO) {
-        return modelMapper.map(testerDTO, Tester.class);
-    }
 }
