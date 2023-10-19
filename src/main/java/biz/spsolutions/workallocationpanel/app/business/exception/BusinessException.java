@@ -1,6 +1,7 @@
 package biz.spsolutions.workallocationpanel.app.business.exception;
 
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 @Data
 public class BusinessException extends RuntimeException {

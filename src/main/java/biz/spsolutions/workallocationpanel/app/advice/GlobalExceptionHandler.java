@@ -80,8 +80,6 @@ public class GlobalExceptionHandler {
         return errorAttributes;
     }
 
-
-
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, Object> commonExceptions(Throwable t) {
