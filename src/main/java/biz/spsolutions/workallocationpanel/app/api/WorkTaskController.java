@@ -37,7 +37,7 @@ public class WorkTaskController {
     }
 
     @GetMapping(path = "/work-task-list")
-    public ResponseEntity<Page<WorkTaskDTO>> getAllTasks(
+    public Page<WorkTaskDTO> getAllTasks(
             @Validated @NotNull @Pattern(regexp = "^(\\d+|ALL)$", message = "wfRef must be a number or 'ALL'")
             @RequestParam("wfRef") String wfRef,
 
@@ -106,7 +106,7 @@ public class WorkTaskController {
 //        System.out.println(workTaskDTO);
 
         Pageable pageable = PageRequest.of(Integer.parseInt(pageNumber), Integer.parseInt(pageSize));
-        return ResponseEntity.ok(workTaskBO.getAllWorkTasks(pageable,workTaskRequestDTO));
+        return workTaskBO.getAllWorkTasks(pageable,workTaskRequestDTO);
     }
 
 

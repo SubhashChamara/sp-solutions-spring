@@ -1,4 +1,6 @@
 package biz.spsolutions.workallocationpanel.app.business.util;
+import biz.spsolutions.workallocationpanel.app.business.exception.BusinessException;
+import biz.spsolutions.workallocationpanel.app.business.exception.BusinessExceptionType;
 import biz.spsolutions.workallocationpanel.app.dto.WorkTaskDTO;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -85,7 +87,8 @@ public class ExcelGenerator {
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Failed to load data to the excel file");
-            return null;
+            throw new BusinessException(BusinessExceptionType.FILE_NOT_CREATE, "Failed to load data to the excel file...", e);
+//            return null;
         }
     }
 
@@ -100,6 +103,8 @@ public class ExcelGenerator {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Failed to decode HTML elements in the work description");
+            throw new BusinessException(BusinessExceptionType.FILE_NOT_CREATE, "Failed to decode HTML elements...", e);
+//
         }
         return conString;
     }
