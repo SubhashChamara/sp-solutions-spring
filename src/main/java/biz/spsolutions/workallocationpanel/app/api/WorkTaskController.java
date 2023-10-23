@@ -221,16 +221,16 @@ public class WorkTaskController {
     ) throws Exception {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        Date startDate;
-//        Date endDate;
-//        try {
-//            startDate = dateFormat.parse(startDateString);
-//            endDate = dateFormat.parse(endDateString);
-//        } catch (Exception e) {
-////            e.printStackTrace();
-//            startDate = null;
-//            endDate = null;
-//        }
+        Date startDate;
+        Date endDate;
+        try {
+            startDate = dateFormat.parse(startDateString);
+            endDate = dateFormat.parse(endDateString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            startDate = null;
+            endDate = null;
+      }
 
         WorkTaskRequestDTO workTaskRequestDTO = new WorkTaskRequestDTO();
 

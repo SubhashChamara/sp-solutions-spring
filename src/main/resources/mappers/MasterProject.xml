@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="biz.spsolutions.workallocationpanel.app.mapper.MasterProject">
+
+        <resultMap id="projectMap" type="biz.spsolutions.workallocationpanel.app.entity.Project">
+            <result property="id" column="Project_Id" />
+            <result property="name" column="Project_Name" />
+        </resultMap>
+
+    <select id="getAllByClient" resultMap="projectMap">
+        SELECT
+            mp.id AS  Project_Id,
+            mp.projectName AS Project_Name
+        FROM master_project mp
+        WHERE mp.active=true AND mp.client_ID_=#{clientID}
+        order by mp.projectName ASC
+    </select>
+
+    </mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="biz.spsolutions.workallocationpanel.app.mapper.MasterJobType">
+
+        <resultMap id="jobtypeMap" type="biz.spsolutions.workallocationpanel.app.entity.JobType">
+            <result property="id" column="JobType_Id" />
+            <result property="name" column="JobType_Name" />
+        </resultMap>
+
+    <select id="getAllByProjectId" resultMap="jobtypeMap">
+        SELECT
+            mj.ID AS JobType_Id,
+            mj.JOB_TYPE AS JobType_Name
+        FROM master_job_type mj
+        WHERE mj.active=true AND mj.FK_PROJECT=#{projectId}
+        ORDER BY JobType_Name ASC
+    </select>
+
+    </mapper>
