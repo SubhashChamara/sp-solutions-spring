@@ -38,13 +38,13 @@ public class WorkTaskController {
 
     @GetMapping(path = "/work-task-list")
     public Page<WorkTaskDTO> getAllTasks(
-            @Validated @NotNull @Pattern(regexp = "^(\\d+|ALL)$", message = "wfRef must be a number or 'ALL'")
+            @Validated @NotNull @Pattern(regexp = "^(\\d*|ALL)$", message = "wfRef must be a number or empty")
             @RequestParam("wfRef") String wfRef,
 
-            @Valid @NotNull @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2}|ALL)$", message = "Invalid date format. Use 'yyyy:MM:dd' or 'ALL'")
+            @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}|\\s*|ALL)$", message = "Invalid date format. Use 'yyyy-MM-dd HH:mm:ss' or 'ALL'")
             @RequestParam("startDate") String startDateString,
 
-            @Valid @NotNull @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2}|ALL)$", message = "Invalid date format. Use 'yyyy:MM:dd' or 'ALL'")
+            @Valid @NotNull @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}|\\s*|ALL)$", message = "Invalid date format. Use 'yyyy:MM:dd' or 'ALL'")
             @RequestParam("endDate") String endDateString,
 
             @Validated @NotNull @Pattern(regexp = "^(\\d+|ALL)$", message = "Client Id must be a number or 'ALL'")
@@ -62,7 +62,7 @@ public class WorkTaskController {
             @Valid @NotNull @Pattern(regexp = "^(Maintainance|Charged|FOC|ALL)$", message = "Invalid ChargeType")
             @RequestParam("chargeType") String chargeType,
 
-            @Valid @NotNull @Pattern(regexp = "^(ONGOING|HOLD|COMPLETED|DEV\\.COMPLETED|DEV\\.RETURN|QA\\.COMPLETED|QA\\.PENDING|NEW|WITH DH|RELEASED|ALL)$", message = "Invalid overallStatus")
+            @Valid @NotNull @Pattern(regexp = "^(ONGOING|HOLD|COMPLETED|DEV\\.COMPLETED|DEV\\.RETURN|QA\\.COMPLETED|QA\\.PENDING|NEW|WITH DH|ALLOCATED|RELEASED|ALL)$", message = "Invalid overallStatus")
             @RequestParam("overallStatus") String status,
 
             @Valid @NotNull @Pattern(regexp = "^([A-Za-z_]+|ALL)$",message = "Invalid PendingUser Name")
@@ -80,7 +80,7 @@ public class WorkTaskController {
             @Valid @NotNull @Pattern(regexp = "^[A-Za-z_]+$",message = "Invalid Logged User")
             @RequestParam("loggedUserId") String loggedUserId
     ) throws Exception {
-
+        System.out.println("Worktasklist get request");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 //        Date startDate;
 //        Date endDate;
@@ -91,9 +91,9 @@ public class WorkTaskController {
 
         WorkTaskRequestDTO workTaskRequestDTO = new WorkTaskRequestDTO();
 
-        workTaskRequestDTO.setWfRef(wfRef.equals("ALL") ? null : wfRef);
-        workTaskRequestDTO.setStartDate(!startDateString.equals("ALL")? dateFormat.parse(startDateString):null);
-        workTaskRequestDTO.setEndDate(!endDateString.equals("ALL")? dateFormat.parse(endDateString):null);
+        workTaskRequestDTO.setWfRef(wfRef.equals("ALL") || wfRef.equals("")  ? null : wfRef);
+        workTaskRequestDTO.setStartDate(!startDateString.equals("ALL") && !startDateString.equals("")? dateFormat.parse(startDateString):null);
+        workTaskRequestDTO.setEndDate(!endDateString.equals("ALL") && !endDateString.equals("")? dateFormat.parse(endDateString):null);
         workTaskRequestDTO.setClientId(client.equals("ALL") ? null : Integer.valueOf(client));
         workTaskRequestDTO.setProjectId(project.equals("ALL") ? null : Integer.valueOf(project));
         workTaskRequestDTO.setJobTypeId(jobType.equals("ALL") ? null : new BigInteger(jobType));
@@ -112,13 +112,13 @@ public class WorkTaskController {
 
     @GetMapping(path = "/work-task-count-list")
     public WorkTaskCounter getAllTaskCount(
-            @Validated @NotNull @Pattern(regexp = "^(\\d+|ALL)$", message = "wfRef must be a number or 'ALL'")
+            @Validated @NotNull @Pattern(regexp = "^(\\d*|ALL)$", message = "wfRef must be a number or empty")
             @RequestParam("wfRef") String wfRef,
 
-            @Valid @NotNull @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2}|ALL)$", message = "Invalid date format. Use 'yyyy:MM:dd' or 'ALL'")
+            @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}|\\s*|ALL)$", message = "Invalid date format. Use 'yyyy-MM-dd HH:mm:ss' or 'ALL'")
             @RequestParam("startDate") String startDateString,
 
-            @Valid @NotNull @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2}|ALL)$", message = "Invalid date format. Use 'yyyy:MM:dd' or 'ALL'")
+            @Valid @NotNull @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}|\\s*|ALL)$", message = "Invalid date format. Use 'yyyy:MM:dd' or 'ALL'")
             @RequestParam("endDate") String endDateString,
 
             @Validated @NotNull @Pattern(regexp = "^(\\d+|ALL)$", message = "Client Id must be a number or 'ALL'")
@@ -136,7 +136,7 @@ public class WorkTaskController {
             @Valid @NotNull @Pattern(regexp = "^(Maintainance|Charged|FOC|ALL)$", message = "Invalid ChargeType")
             @RequestParam("chargeType") String chargeType,
 
-            @Valid @NotNull @Pattern(regexp = "^(ONGOING|HOLD|COMPLETED|DEV\\.COMPLETED|DEV\\.RETURN|QA\\.COMPLETED|QA\\.PENDING|NEW|WITH DH|RELEASED|ALL)$", message = "Invalid overallStatus")
+            @Valid @NotNull @Pattern(regexp = "^(ONGOING|HOLD|COMPLETED|DEV\\.COMPLETED|DEV\\.RETURN|QA\\.COMPLETED|QA\\.PENDING|NEW|WITH DH|ALLOCATED|INCOMPLETED|RELEASED|ALL)$", message = "Invalid overallStatus")
             @RequestParam("overallStatus") String status,
 
             @Valid @NotNull @Pattern(regexp = "^([A-Za-z_]+|ALL)$",message = "Invalid PendingUser Name")
@@ -148,7 +148,7 @@ public class WorkTaskController {
             @Valid @NotNull @Pattern(regexp = "^[A-Za-z_]+$",message = "Invalid Logged User")
             @RequestParam("loggedUserId") String loggedUserId
     ) throws Exception {
-
+        System.out.println("countList request");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 //        Date startDate;
 //        Date endDate;
@@ -163,9 +163,9 @@ public class WorkTaskController {
 
         WorkTaskRequestDTO workTaskRequestDTO = new WorkTaskRequestDTO();
 
-        workTaskRequestDTO.setWfRef(wfRef.equals("ALL") ? null : wfRef);
-        workTaskRequestDTO.setStartDate(!startDateString.equals("ALL")? dateFormat.parse(startDateString):null);
-        workTaskRequestDTO.setEndDate(!endDateString.equals("ALL")? dateFormat.parse(endDateString):null);
+        workTaskRequestDTO.setWfRef(wfRef.equals("ALL") || wfRef.equals("")  ? null : wfRef);
+        workTaskRequestDTO.setStartDate(!startDateString.equals("ALL") && !startDateString.equals("")? dateFormat.parse(startDateString):null);
+        workTaskRequestDTO.setEndDate(!endDateString.equals("ALL") && !endDateString.equals("")? dateFormat.parse(endDateString):null);
         workTaskRequestDTO.setClientId(client.equals("ALL") ? null : Integer.valueOf(client));
         workTaskRequestDTO.setProjectId(project.equals("ALL") ? null : Integer.valueOf(project));
         workTaskRequestDTO.setJobTypeId(jobType.equals("ALL") ? null : new BigInteger(jobType));
@@ -183,13 +183,13 @@ public class WorkTaskController {
 
     @GetMapping(path = "/download-excel")
     public ResponseEntity<Resource> downloadWorkTaskExcel(
-            @Validated @NotNull @Pattern(regexp = "^(\\d+|ALL)$", message = "wfRef must be a number or 'ALL'")
+            @Validated @NotNull @Pattern(regexp = "^(\\d*|ALL)$", message = "wfRef must be a number or empty")
             @RequestParam("wfRef") String wfRef,
 
-            @Valid @NotNull @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2}|ALL)$", message = "Invalid date format. Use 'yyyy:MM:dd' or 'ALL'")
+            @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}|\\s*|ALL)$", message = "Invalid date format. Use 'yyyy-MM-dd HH:mm:ss' or 'ALL'")
             @RequestParam("startDate") String startDateString,
 
-            @Valid @NotNull @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2}|ALL)$", message = "Invalid date format. Use 'yyyy:MM:dd' or 'ALL'")
+            @Valid @NotNull @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}|\\s*|ALL)$", message = "Invalid date format. Use 'yyyy:MM:dd' or 'ALL'")
             @RequestParam("endDate") String endDateString,
 
             @Validated @NotNull @Pattern(regexp = "^(\\d+|ALL)$", message = "Client Id must be a number or 'ALL'")
@@ -207,7 +207,7 @@ public class WorkTaskController {
             @Valid @NotNull @Pattern(regexp = "^(Maintainance|Charged|FOC|ALL)$", message = "Invalid ChargeType")
             @RequestParam("chargeType") String chargeType,
 
-            @Valid @NotNull @Pattern(regexp = "^(ONGOING|HOLD|COMPLETED|DEV\\.COMPLETED|DEV\\.RETURN|QA\\.COMPLETED|QA\\.PENDING|NEW|WITH DH|RELEASED|ALL)$", message = "Invalid overallStatus")
+            @Valid @NotNull @Pattern(regexp = "^(ONGOING|HOLD|COMPLETED|DEV\\.COMPLETED|DEV\\.RETURN|QA\\.COMPLETED|QA\\.PENDING|NEW|WITH DH|ALLOCATED|RELEASED|ALL)$", message = "Invalid overallStatus")
             @RequestParam("overallStatus") String status,
 
             @Valid @NotNull @Pattern(regexp = "^([A-Za-z_]+|ALL)$",message = "Invalid PendingUser Name")
@@ -234,9 +234,9 @@ public class WorkTaskController {
 
         WorkTaskRequestDTO workTaskRequestDTO = new WorkTaskRequestDTO();
 
-        workTaskRequestDTO.setWfRef(wfRef.equals("ALL") ? null : wfRef);
-        workTaskRequestDTO.setStartDate(!startDateString.equals("ALL")? dateFormat.parse(startDateString):null);
-        workTaskRequestDTO.setEndDate(!endDateString.equals("ALL")? dateFormat.parse(endDateString):null);
+        workTaskRequestDTO.setWfRef(wfRef.equals("ALL") || wfRef.equals("")  ? null : wfRef);
+        workTaskRequestDTO.setStartDate(!startDateString.equals("ALL") && !startDateString.equals("")? dateFormat.parse(startDateString):null);
+        workTaskRequestDTO.setEndDate(!endDateString.equals("ALL") && !endDateString.equals("")? dateFormat.parse(endDateString):null);
         workTaskRequestDTO.setClientId(client.equals("ALL") ? null : Integer.valueOf(client));
         workTaskRequestDTO.setProjectId(project.equals("ALL") ? null : Integer.valueOf(project));
         workTaskRequestDTO.setJobTypeId(jobType.equals("ALL") ? null : new BigInteger(jobType));

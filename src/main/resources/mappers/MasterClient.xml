@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="biz.spsolutions.workallocationpanel.app.mapper.MasterClient">
+
+        <resultMap id="clientMap" type="biz.spsolutions.workallocationpanel.app.entity.Client">
+            <result property="id" column="Client_Id" />
+            <result property="name" column="Client_Name" />
+        </resultMap>
+
+    <select id="getAll" resultMap="clientMap">
+        SELECT mc.ID_ AS Client_Id,
+               mc.NAME_ AS Client_Name
+        FROM master_client  mc WHERE mc.active=true ORDER BY mc.NAME_
+
+    </select>
+
+    </mapper>

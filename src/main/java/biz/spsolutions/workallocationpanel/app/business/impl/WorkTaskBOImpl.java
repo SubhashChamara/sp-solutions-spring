@@ -80,6 +80,7 @@ public class WorkTaskBOImpl implements WorkTaskBO {
 //        Long totalCount = workTaskMapper.getTotalCount(workTaskDTO.getWfRef(), workTaskDTO.getStartDate(), workTaskDTO.getEndDate(), workTaskDTO.getClientId(), workTaskDTO.getProjectId(), workTaskDTO.getTaskOverallStatus(), workTaskDTO.getDeveloper(), workTaskDTO.getWorkType(), workTaskDTO.getChargeStatus(), workTaskDTO.getJobTypeId(),workTaskDTO.getPendingUser(),workTaskDTO.getClientUserId());
 //        Long totalCount1 = workTaskMapper.getTotalCounts();
         Date today = new Date();
+        System.out.println(today);
         WorkTaskCounter counts = workTaskMapper.getCounts(workTaskRequestDTO.getWfRef(), workTaskRequestDTO.getStartDate(), workTaskRequestDTO.getEndDate(), workTaskRequestDTO.getClientId(), workTaskRequestDTO.getProjectId(), workTaskRequestDTO.getTaskOverallStatus(), workTaskRequestDTO.getDeveloper(), workTaskRequestDTO.getWorkType(), workTaskRequestDTO.getChargeStatus(), workTaskRequestDTO.getJobTypeId(), workTaskRequestDTO.getPendingUser(), workTaskRequestDTO.getLoggedUser(),today);
 //        System.out.println(counts);
         Long totalCount =counts.getTotalCount();
