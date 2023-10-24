@@ -5,6 +5,12 @@ import biz.spsolutions.workallocationpanel.app.dto.ClientDTO;
 import biz.spsolutions.workallocationpanel.app.dto.DeveloperDTO;
 import biz.spsolutions.workallocationpanel.app.dto.JobTypeDTO;
 import biz.spsolutions.workallocationpanel.app.dto.ProjectDTO;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +18,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping("api/v1/data")
+@Validated
 public class FrontEndDataController {
 
     private final FrontEndDataBO frontEndDataBO;
@@ -26,14 +33,16 @@ public class FrontEndDataController {
     }
 
     @GetMapping("/projectList")
-    public List<ProjectDTO> getClientList(@RequestParam("clientId")int clientId) throws Exception {
-        System.out.println("request to project-list");
+    public List<ProjectDTO> getClientList(
+            @Validated @NotNull @Positive(message = "ClientId must be a positive number")
+            @RequestParam("clientId") int clientId) throws Exception {
         return frontEndDataBO.getProjectListByClient(clientId);
     }
 
     @GetMapping("/jobTypeList")
-    public List<JobTypeDTO> getJobTypeList(@RequestParam("projectId")int projectId) throws Exception {
-        System.out.println(frontEndDataBO.getJobTypesByProjectID(projectId));
+    public List<JobTypeDTO> getJobTypeList(
+            @Validated @NotNull @Positive(message = "ClientId must be a positive number")
+            @RequestParam("projectId")int projectId) throws Exception {
         return frontEndDataBO.getJobTypesByProjectID(projectId);
     }
 
