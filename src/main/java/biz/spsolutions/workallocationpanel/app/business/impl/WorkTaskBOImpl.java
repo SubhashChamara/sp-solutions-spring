@@ -21,23 +21,18 @@ import java.util.stream.Collectors;
 
 @Service
 public class WorkTaskBOImpl implements WorkTaskBO {
-//    private final WorkTaskDAO workTaskDAO;
-
     private final WorkTaskMapper workTaskMapper;
     private final ActIdMembershipMapper actIdMembershipMapper;
     private final Transformer transformer;
     private final ExcelGenerator excelGenerator;
-
-//    private final ActIdMembershipDAO actIdMembershipDAO;
     private final int pageSize;
 
     public WorkTaskBOImpl(WorkTaskMapper workTaskMapper, ActIdMembershipMapper actIdMembershipMapper, Transformer transformer, ExcelGenerator excelGenerator) {
-//        this.workTaskDAO = workTaskDAO;
+
         this.workTaskMapper = workTaskMapper;
         this.actIdMembershipMapper = actIdMembershipMapper;
         this.transformer = transformer;
         this.excelGenerator = excelGenerator;
-//        this.actIdMembershipDAO = actIdMembershipDAO;
         this.pageSize = 5;
     }
 
@@ -48,21 +43,8 @@ public class WorkTaskBOImpl implements WorkTaskBO {
         workTaskRequestDTO.setLoggedUser(counter>0? workTaskRequestDTO.getLoggedUser():null);
 
         List<WorkTask> workTaskPage = workTaskMapper.getAll(pageable, workTaskRequestDTO.getWfRef(), workTaskRequestDTO.getStartDate(), workTaskRequestDTO.getEndDate(), workTaskRequestDTO.getClientId(), workTaskRequestDTO.getProjectId(), workTaskRequestDTO.getTaskOverallStatus(), workTaskRequestDTO.getDeveloper(), workTaskRequestDTO.getWorkType(), workTaskRequestDTO.getChargeStatus(), workTaskRequestDTO.getJobTypeId(),workTaskRequestDTO.getPendingUser(),workTaskRequestDTO.getLoggedUser());
-//        Page<WorkTask> page = (Page<WorkTask>) workTaskPage;
-//        System.out.println("==============>Total eleents "+ page.getTotalElements());
         List<WorkTaskDTO> worktaskDTOList = workTaskPage.stream().map(transformer::fromEntity).collect(Collectors.toList());
-//        Long totalCount = workTaskMapper.getTotalCount(workTaskDTO.getWfRef(), workTaskDTO.getStartDate(), workTaskDTO.getEndDate(), workTaskDTO.getClientId(), workTaskDTO.getProjectId(), workTaskDTO.getTaskOverallStatus(), workTaskDTO.getDeveloper(), workTaskDTO.getWorkType(), workTaskDTO.getChargeStatus(), workTaskDTO.getJobTypeId(),workTaskDTO.getPendingUser(),workTaskDTO.getClientUserId());
         Long totalCount = workTaskMapper.getTotalCounts();
-//        Date today = new Date();
-//        WorkTaskCounter counts = workTaskMapper.getCounts(workTaskRequestDTO.getWfRef(), workTaskRequestDTO.getStartDate(), workTaskRequestDTO.getEndDate(), workTaskRequestDTO.getClientId(), workTaskRequestDTO.getProjectId(), workTaskRequestDTO.getTaskOverallStatus(), workTaskRequestDTO.getDeveloper(), workTaskRequestDTO.getWorkType(), workTaskRequestDTO.getChargeStatus(), workTaskRequestDTO.getJobTypeId(), workTaskRequestDTO.getPendingUser(), workTaskRequestDTO.getLoggedUser(),today);
-//        System.out.println(counts);
-//        Long totalCount =counts.getTotalCount();
-//        Long lateCount =counts.getLateCount();
-//        Long withinDueCountPercentage = (totalCount - lateCount)*100;
-//        counts.setWithinDueDatePercentage(Math.round(((totalCount - lateCount) / (double) totalCount) * 10000.0) / 100.0);
-//        counts.setLatePercentage(Math.round((lateCount / (double) totalCount) * 10000.0) / 100.0);
-//        CustomPage workTaskDTOSPage = new CustomPage(worktaskDTOList, (PageRequest) pageable, totalCount, counts);
-//        return workTaskDTOSPage;
         return new PageImpl<>(worktaskDTOList, pageable, totalCount);
 
     }
@@ -72,25 +54,15 @@ public class WorkTaskBOImpl implements WorkTaskBO {
 
         Integer counter = actIdMembershipMapper.getUserGroupId(workTaskRequestDTO.getLoggedUser());
         workTaskRequestDTO.setLoggedUser(counter>0? workTaskRequestDTO.getLoggedUser():null);
-
-//        List<WorkTask> workTaskPage = workTaskMapper.getAll(pageable, workTaskRequestDTO.getWfRef(), workTaskRequestDTO.getStartDate(), workTaskRequestDTO.getEndDate(), workTaskRequestDTO.getClientId(), workTaskRequestDTO.getProjectId(), workTaskRequestDTO.getTaskOverallStatus(), workTaskRequestDTO.getDeveloper(), workTaskRequestDTO.getWorkType(), workTaskRequestDTO.getChargeStatus(), workTaskRequestDTO.getJobTypeId(),workTaskRequestDTO.getPendingUser(),workTaskRequestDTO.getLoggedUser());
-//        Page<WorkTask> page = (Page<WorkTask>) workTaskPage;
-//        System.out.println("==============>Total eleents "+ page.getTotalElements());
-//        List<WorkTaskDTO> worktaskDTOList = workTaskPage.stream().map(transformer::fromEntity).collect(Collectors.toList());
-//        Long totalCount = workTaskMapper.getTotalCount(workTaskDTO.getWfRef(), workTaskDTO.getStartDate(), workTaskDTO.getEndDate(), workTaskDTO.getClientId(), workTaskDTO.getProjectId(), workTaskDTO.getTaskOverallStatus(), workTaskDTO.getDeveloper(), workTaskDTO.getWorkType(), workTaskDTO.getChargeStatus(), workTaskDTO.getJobTypeId(),workTaskDTO.getPendingUser(),workTaskDTO.getClientUserId());
-//        Long totalCount1 = workTaskMapper.getTotalCounts();
         Date today = new Date();
         System.out.println(today);
         WorkTaskCounter counts = workTaskMapper.getCounts(workTaskRequestDTO.getWfRef(), workTaskRequestDTO.getStartDate(), workTaskRequestDTO.getEndDate(), workTaskRequestDTO.getClientId(), workTaskRequestDTO.getProjectId(), workTaskRequestDTO.getTaskOverallStatus(), workTaskRequestDTO.getDeveloper(), workTaskRequestDTO.getWorkType(), workTaskRequestDTO.getChargeStatus(), workTaskRequestDTO.getJobTypeId(), workTaskRequestDTO.getPendingUser(), workTaskRequestDTO.getLoggedUser(),today);
-//        System.out.println(counts);
         Long totalCount =counts.getTotalCount();
         Long lateCount =counts.getLateCount();
-//        Long withinDueCountPercentage = (totalCount - lateCount)*100;
+
         counts.setWithinDueDatePercentage(Math.round(((totalCount - lateCount) / (double) totalCount) * 10000.0) / 100.0);
         counts.setLatePercentage(Math.round((lateCount / (double) totalCount) * 10000.0) / 100.0);
-//        CustomPage workTaskDTOSPage = new CustomPage(worktaskDTOList, (PageRequest) pageable, totalCount, counts);
         return  counts;
-//        return new PageImpl<>(worktaskDTOList, pageable, totalCount);
 
     }
 
@@ -99,14 +71,11 @@ public class WorkTaskBOImpl implements WorkTaskBO {
         Integer counter = actIdMembershipMapper.getUserGroupId(workTaskRequestDTO.getLoggedUser());
         workTaskRequestDTO.setLoggedUser(counter>0? workTaskRequestDTO.getLoggedUser():null);
         List<WorkTask> workTaskPage = workTaskMapper.getAll(pageable, workTaskRequestDTO.getWfRef(), workTaskRequestDTO.getStartDate(), workTaskRequestDTO.getEndDate(), workTaskRequestDTO.getClientId(), workTaskRequestDTO.getProjectId(), workTaskRequestDTO.getTaskOverallStatus(), workTaskRequestDTO.getDeveloper(), workTaskRequestDTO.getWorkType(), workTaskRequestDTO.getChargeStatus(), workTaskRequestDTO.getJobTypeId(),workTaskRequestDTO.getPendingUser(),workTaskRequestDTO.getLoggedUser());
-//        System.out.println("pageable at bo"+pageable);
-//        Page<WorkTask> page = (Page<WorkTask>) workTaskPage;
-//        System.out.println("==============>Total eleents "+ page.getTotalElements());
         List<WorkTaskDTO> worktaskDTOList = workTaskPage.stream().map(transformer::fromEntity).collect(Collectors.toList());
-//        System.out.println("workflow list size"+workTaskPage.size());
+
         ByteArrayInputStream byteArrayInputStream = excelGenerator.dateToExcel(worktaskDTOList);
         return byteArrayInputStream;
-//
+
     }
 
 

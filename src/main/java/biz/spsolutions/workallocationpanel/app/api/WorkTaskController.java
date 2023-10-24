@@ -82,13 +82,6 @@ public class WorkTaskController {
     ) throws Exception {
         System.out.println("Worktasklist get request");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        Date startDate;
-//        Date endDate;
-//
-//         Date startDate = startDateString!=null? dateFormat.parse(startDateString):null;
-//         Date endDate = endDateString !=null? dateFormat.parse(endDateString):null;
-//
-
         WorkTaskRequestDTO workTaskRequestDTO = new WorkTaskRequestDTO();
 
         workTaskRequestDTO.setWfRef(wfRef.equals("ALL") || wfRef.equals("")  ? null : wfRef);
@@ -103,7 +96,6 @@ public class WorkTaskController {
         workTaskRequestDTO.setPendingUser(pendingUser.equals("ALL") ? null : pendingUser);
         workTaskRequestDTO.setDeveloper(developer.equals("ALL") ? null : developer);
         workTaskRequestDTO.setLoggedUser(loggedUserId);
-//        System.out.println(workTaskDTO);
 
         Pageable pageable = PageRequest.of(Integer.parseInt(pageNumber), Integer.parseInt(pageSize));
         return workTaskBO.getAllWorkTasks(pageable,workTaskRequestDTO);
@@ -150,17 +142,6 @@ public class WorkTaskController {
     ) throws Exception {
         System.out.println("countList request");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        Date startDate;
-//        Date endDate;
-//        try {
-//            startDate = dateFormat.parse(startDateString);
-//            endDate = dateFormat.parse(endDateString);
-//        } catch (Exception e) {
-////            e.printStackTrace();
-//            startDate = null;
-//            endDate = null;
-//        }
-
         WorkTaskRequestDTO workTaskRequestDTO = new WorkTaskRequestDTO();
 
         workTaskRequestDTO.setWfRef(wfRef.equals("ALL") || wfRef.equals("")  ? null : wfRef);
@@ -175,9 +156,7 @@ public class WorkTaskController {
         workTaskRequestDTO.setPendingUser(pendingUser.equals("ALL") ? null : pendingUser);
         workTaskRequestDTO.setDeveloper(developer.equals("ALL") ? null : developer);
         workTaskRequestDTO.setLoggedUser(loggedUserId);
-//        System.out.println(workTaskDTO);
 
-//        Pageable pageable = PageRequest.of(Integer.parseInt(pageNumber), Integer.parseInt(pageSize));
         return workTaskBO.getWorkTasksCountList(workTaskRequestDTO);
     }
 
@@ -221,16 +200,16 @@ public class WorkTaskController {
     ) throws Exception {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate;
-        Date endDate;
-        try {
-            startDate = dateFormat.parse(startDateString);
-            endDate = dateFormat.parse(endDateString);
-        } catch (Exception e) {
-            e.printStackTrace();
-            startDate = null;
-            endDate = null;
-      }
+//        Date startDate;
+//        Date endDate;
+//        try {
+//            startDate = dateFormat.parse(startDateString);
+//            endDate = dateFormat.parse(endDateString);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            startDate = null;
+//            endDate = null;
+//      }
 
         WorkTaskRequestDTO workTaskRequestDTO = new WorkTaskRequestDTO();
 
@@ -246,9 +225,7 @@ public class WorkTaskController {
         workTaskRequestDTO.setPendingUser(pendingUser.equals("ALL") ? null : pendingUser);
         workTaskRequestDTO.setDeveloper(developer.equals("ALL") ? null : developer);
         workTaskRequestDTO.setLoggedUser(loggedUserId);
-//        System.out.println(workTaskDTO);
 
-//        Pageable pageable = PageRequest.of(Integer.parseInt("0"), Integer.parseInt("0"));
         ByteArrayInputStream workTaskListExcel = workTaskBO.getWorkTaskListExcel(null, workTaskRequestDTO);
         InputStreamResource file = new InputStreamResource(workTaskListExcel);
         String fileName = "worktask.xlsx";
